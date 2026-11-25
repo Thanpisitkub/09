@@ -1,0 +1,66 @@
+# Builds the game with Rojo and uploads it to Roblox through Open Cloud — no Roblox Studio needed.
+# Setup (once): add the secret ROBLOX_API_KEY and the variables ROBLOX_UNIVERSE_ID / ROBLOX_PLACE_ID
+# in GitHub -> Settings -> Secrets and variables -> Actions. See README.md.
+name: Publish to Roblox
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Published = live for players, Saved = only visible in Studio"
+        type: choice
+        options: [Published, Saved]
+        default: Published
+
+concurrency:
+  group: publish-roblox
+  cancel-in-progress: false
+
+env:
+  ROJO_VERSION: "7.5.1" # bump if this release is ever removed
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rojo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/rojo && cd /tmp/rojo
+          gh release download "v${ROJO_VERSION}" --repo rojo-rbx/rojo --pattern '*linux*'
+          archive="$(ls | grep -vi aarch64 | head -n 1)"
+          unzip -o "$archive"
+          sudo install -m 755 rojo /usr/local/bin/rojo
+          rojo --version
+
+      - name: Build place file
+        run: rojo build default.project.json --output build/game.rbxl
+
+      - name: Check the secrets are set
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: |
+          test -n "$ROBLOX_API_KEY" || { echo "Missing secret ROBLOX_API_KEY"; exit 1; }
+          test -n "$UNIVERSE_ID" || { echo "Missing variable ROBLOX_UNIVERSE_ID"; exit 1; }
+          test -n "$PLACE_ID" || { echo "Missing variable ROBLOX_PLACE_ID"; exit 1; }
+
+      - name: Upload to Roblox
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+          VERSION_TYPE: ${{ inputs.version_type || 'Published' }}
+        run: |
+          curl --fail-with-body --silent --show-error --location --request POST \
+            "https://apis.roblox.com/universes/v1/${UNIVERSE_ID}/places/${PLACE_ID}/versions?versionType=${VERSION_TYPE}" \
+            --header "x-api-key: ${ROBLOX_API_KEY}" \
+            --header "Content-Type: application/octet-stream" \
+            --data-binary @build/game.rbxl
+          echo
