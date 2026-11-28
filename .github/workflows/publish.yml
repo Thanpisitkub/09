@@ -55,7 +55,7 @@ jobs:
           rojo --version
 
       - name: Build place file
-        run: rojo build default.project.json --output build/game.rbxl
+        run: mkdir -p build && rojo build default.project.json --output build/game.rbxl
 
       - name: Check the secrets are set
         env:
