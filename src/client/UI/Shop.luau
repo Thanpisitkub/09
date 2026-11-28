@@ -20,7 +20,7 @@ function Shop.Init()
 	Kit.label({
 		Parent = win.Content,
 		Size = UDim2.new(1, -160, 0, 26),
-		Text = "Better food draws rarer animals",
+		Text = "Better food summons rarer characters",
 		Font = F.Bold,
 		TextSize = 15,
 		TextColor3 = C.InkSoft,
@@ -39,6 +39,7 @@ function Shop.Init()
 			Parent = grid,
 			LayoutOrder = i,
 			Emoji = food.Emoji,
+			Icon = food.Icon,
 			Title = food.Name,
 			Rarity = food.Tier,
 		})
@@ -55,17 +56,17 @@ function Shop.Init()
 
 	local function update()
 		local m, level = State.get("Money"), State.get("Level")
-		money.Text = `{Theme.Icons.Money} {Util.fmt(m)}`
+		money.Text = `Money: ${Util.fmt(m)}`
 		for id, row in rows do
 			local f = row.food
 			local owned = State.foodCount(id)
 			row.tile.Sub.Text = owned > 0 and `Lv {f.RequiredLevel}+ · owned {owned}` or `Lv {f.RequiredLevel}+`
 			if level < f.RequiredLevel then
 				row.btn.SetStyle("locked")
-				row.btn.SetText(`{Theme.Icons.Lock} Lv {f.RequiredLevel}`)
+				row.btn.SetText(`Lv {f.RequiredLevel}`)
 			else
 				row.btn.SetStyle(m >= f.Price and "good" or "gold")
-				row.btn.SetText(`{Theme.Icons.Money} {Util.fmt(f.Price)}`)
+				row.btn.SetText(`${Util.fmt(f.Price)}`)
 			end
 		end
 	end

@@ -42,22 +42,30 @@ for i, s in Catalog.Sizes do
 	Catalog.SizeByName[s.Name] = s
 end
 
--- 12 areas x 6 animals = 72 animals.
+-- 12 anime zones x 6 characters = 72 ORIGINAL characters (archetypes, not existing anime IP).
+-- { name, portrait emoji (fallback), face icon key, hair color }
 local areaDefs = {
-	{ "Green Meadow", "7ED957", { { "Rabbit", "🐇" }, { "Chicken", "🐔" }, { "Duck", "🦆" }, { "Sheep", "🐑" }, { "Pig", "🐖" }, { "Deer", "🦌" } } },
-	{ "Sunny Farm", "F2C94C", { { "Cow", "🐄" }, { "Horse", "🐎" }, { "Goat", "🐐" }, { "Donkey", "🐴" }, { "Turkey", "🦃" }, { "Alpaca", "🦙" } } },
-	{ "Tropical Jungle", "27AE60", { { "Monkey", "🐒" }, { "Toucan", "🐦" }, { "Parrot", "🦜" }, { "Jaguar", "🐆" }, { "Sloth", "🦥" }, { "Capybara", "🐹" } } },
-	{ "Desert Kingdom", "E2A93B", { { "Camel", "🐪" }, { "Fennec Fox", "🦊" }, { "Meerkat", "🐿️" }, { "Desert Fox", "🦊" }, { "Scorpion", "🦂" }, { "Desert Tortoise", "🐢" } } },
-	{ "Frozen Mountains", "9BDDFF", { { "Polar Bear", "🐻" }, { "Arctic Fox", "🦊" }, { "Penguin", "🐧" }, { "Reindeer", "🦌" }, { "Seal", "🦦" }, { "Snow Leopard", "🐆" } } },
-	{ "Deep Ocean", "2D9CDB", { { "Dolphin", "🐬" }, { "Shark", "🦈" }, { "Sea Turtle", "🐢" }, { "Octopus", "🐙" }, { "Whale", "🐋" }, { "Seahorse", "🐠" } } },
-	{ "Volcanic Island", "EB5757", { { "Fire Salamander", "🦎" }, { "Lava Lizard", "🦎" }, { "Phoenix", "🔥" }, { "Red Dragon", "🐉" }, { "Magma Turtle", "🐢" }, { "Fire Fox", "🦊" } } },
-	{ "Mystical Forest", "9B51E0", { { "Unicorn", "🦄" }, { "Fairy Fox", "🦊" }, { "Spirit Deer", "🦌" }, { "Crystal Owl", "🦉" }, { "Moon Rabbit", "🐇" }, { "Magical Wolf", "🐺" } } },
-	{ "Sky Kingdom", "74C0FC", { { "Sky Dragon", "🐲" }, { "Cloud Pegasus", "🦄" }, { "Golden Eagle", "🦅" }, { "Storm Phoenix", "🔥" }, { "Celestial Butterfly", "🦋" }, { "Cloud Lion", "🦁" } } },
-	{ "Ancient Kingdom", "C9A227", { { "Royal Griffin", "🦅" }, { "Ancient Dragon", "🐉" }, { "Golden Tiger", "🐯" }, { "Royal Lion", "🦁" }, { "Ancient Phoenix", "🔥" }, { "Imperial Elephant", "🐘" } } },
-	{ "Galaxy World", "5B4BDB", { { "Galaxy Cat", "🐈" }, { "Cosmic Whale", "🐋" }, { "Alien Fox", "🦊" }, { "Star Dragon", "🐲" }, { "Nebula Rabbit", "🐇" }, { "Space Phoenix", "🔥" } } },
-	{ "Divine Realm", "FFE066", { { "Divine Dragon", "🐉" }, { "Celestial Lion", "🦁" }, { "Eternal Phoenix", "🔥" }, { "Heavenly Unicorn", "🦄" }, { "Godly Wolf", "🐺" }, { "Infinity Whale", "🐋" } } },
+	{ "Sakura Village", "FF9EC4", { { "Petal Girl", "🌸", "FaceBeam", "FFB7D5" }, { "Village Boy", "🧒", "FaceZany", "7A5230" }, { "Lantern Keeper", "🏮", "FaceShy", "FF8F2B" }, { "Kitsune Maiden", "🦊", "FaceWink", "E8A33B" }, { "Blossom Archer", "🏹", "FaceCool", "FF6FA8" }, { "Cherry Captain", "⚔️", "FaceSalute", "C2185B" } } },
+	{ "Ninja Dojo Hills", "6FBF73", { { "Rookie Ninja", "🥋", "FaceBeam", "2F3A4F" }, { "Shadow Scout", "🌑", "FaceSmirk", "1B1B2F" }, { "Shuriken Kid", "⭐", "FaceZany", "3A86FF" }, { "Smoke Master", "💨", "FaceThink", "6C7A89" }, { "Bamboo Blade", "🎋", "FaceCool", "2E7D32" }, { "Grand Sensei", "🧘", "FaceSalute", "E0E0E0" } } },
+	{ "Samurai Castle", "C0392B", { { "Foot Soldier", "🛡️", "FaceAngry", "5D4037" }, { "Ronin Wanderer", "🗡️", "FaceSleep", "37474F" }, { "Katana Lady", "🌺", "FaceCool", "880E4F" }, { "Banner Knight", "🚩", "FaceSalute", "B71C1C" }, { "Shogun Heir", "🏯", "FaceSmirk", "311B92" }, { "Iron Shogun", "👺", "FaceAngry", "212121" } } },
+	{ "Magic Academy", "7E57C2", { { "Apprentice Mage", "🧙", "FaceNerd", "6A4C93" }, { "Potion Prodigy", "🧪", "FaceZany", "00BFA5" }, { "Rune Scholar", "📚", "FaceThink", "3949AB" }, { "Star Witch", "🌟", "FaceStar", "FFD54F" }, { "Spell Duelist", "🔮", "FaceSmirk", "E91E63" }, { "Archmage Headmaster", "🎓", "FaceBoom", "9E9E9E" } } },
+	{ "Spirit Shrine", "4FC3F7", { { "Shrine Maiden", "⛩️", "FaceHalo", "F8BBD0" }, { "Fox Spirit", "🦊", "FaceWink", "FF7043" }, { "Wisp Child", "👻", "FaceBeam", "80DEEA" }, { "Oni Guard", "👹", "FaceAngry", "D32F2F" }, { "Spirit Monk", "🙏", "FaceSleep", "8D6E63" }, { "Moon Kitsune", "🌙", "FaceStar", "CFD8DC" } } },
+	{ "Pirate Seas", "29B6F6", { { "Deckhand", "⚓", "FaceBeam", "5D4037" }, { "Cannon Girl", "💥", "FaceBoom", "FF7043" }, { "Navigator", "🧭", "FaceThink", "26A69A" }, { "First Mate", "🏴", "FaceCool", "455A64" }, { "Storm Captain", "⛈️", "FaceSalute", "1A237E" }, { "Treasure Queen", "👑", "FaceSmirk", "FFC107" } } },
+	{ "Neon Tokyo", "EC407A", { { "Idol Trainee", "🎤", "FaceBeam", "FF80AB" }, { "Street Racer", "🏎️", "FaceCool", "00E5FF" }, { "Hacker Girl", "💻", "FaceSmirk", "76FF03" }, { "Cyber Samurai", "🤖", "FaceSalute", "651FFF" }, { "Neon DJ", "🎧", "FaceParty", "F50057" }, { "Virtual Idol", "💿", "FaceStar", "18FFFF" } } },
+	{ "Mecha Wasteland", "FF7043", { { "Pilot Cadet", "🚀", "FaceBeam", "5D4037" }, { "Mech Mechanic", "🔧", "FaceNerd", "FFA000" }, { "Robo Buddy", "🤖", "FaceZany", "B0BEC5" }, { "Ace Pilot", "🛩️", "FaceCool", "D84315" }, { "Titan Commander", "⚙️", "FaceSalute", "37474F" }, { "Core Guardian", "⚡", "FaceBoom", "FF1744" } } },
+	{ "Demon Hunt Forest", "8E44AD", { { "Night Hunter", "🌃", "FaceCool", "311B92" }, { "Blade Novice", "🗡️", "FaceShy", "4E342E" }, { "Crimson Oni", "👹", "FaceDevil", "C62828" }, { "Lily Spirit", "🥀", "FaceHeart", "AD1457" }, { "Twin Fang", "🐺", "FaceAngry", "455A64" }, { "Dawn Captain", "🌅", "FaceSalute", "FF8F00" } } },
+	{ "Isekai Kingdom", "66BB6A", { { "Reborn Hero", "✨", "FaceBeam", "42A5F5" }, { "Elf Archer", "🧝", "FaceWink", "9CCC65" }, { "Dwarf Smith", "🔨", "FaceCool", "8D6E63" }, { "Demon Lord", "😈", "FaceDevil", "4A148C" }, { "Hero Princess", "👸", "FaceHeart", "F48FB1" }, { "Goddess Guide", "🌿", "FaceHalo", "80CBC4" } } },
+	{ "Hero Academy City", "42A5F5", { { "Rookie Hero", "🦸", "FaceBeam", "66BB6A" }, { "Speed Hero", "💨", "FaceZany", "FFEE58" }, { "Sky Hero", "☁️", "FaceCool", "90CAF9" }, { "Shield Hero", "🛡️", "FaceSalute", "78909C" }, { "Top Pro Hero", "🏅", "FaceSmirk", "EF5350" }, { "Legend Hero", "🌞", "FaceStar", "FFD600" } } },
+	{ "Celestial Heaven", "FFD54F", { { "Angel Trainee", "👼", "FaceHalo", "FFF9C4" }, { "Starlight Idol", "🌟", "FaceParty", "FFCA28" }, { "Halo Knight", "⚜️", "FaceSalute", "B0BEC5" }, { "Cosmic Sage", "🪐", "FaceThink", "7E57C2" }, { "Divine Valkyrie", "🔱", "FaceCool", "FFD54F" }, { "Heavenly Emperor", "👑", "FaceBoom", "FFFFFF" } } },
 }
 local OFFSETS = { 0, 0, 1, 1, 2, 3 }
+local FOOD_ICON = {
+	Carrot = "Carrot", Apple = "Apple", Wheat = "Wheat", Banana = "Banana", Mango = "Lemon",
+	["Crystal Berry"] = "Blueberry", ["Divine Fruit"] = "Orange", ["Golden Apple"] = "GoldenApple",
+	["Angel Cookie"] = "Cookie", ["Rainbow Cake"] = "Pancake", ["Nebula Pie"] = "Pizza",
+	["Cosmic Berry"] = "Strawberry", ["Infinity Feast"] = "Burger", ["Sovereign Elixir"] = "PurplePotion",
+	["Star Fruit"] = "Star",
+}
 
 Catalog.Areas = {}
 Catalog.Animals = {}
@@ -80,10 +88,12 @@ for ai, def in areaDefs do
 			Id = id,
 			Name = pair[1],
 			Emoji = pair[2],
+			Icon = pair[3],
+			Hair = hex(pair[4]),
 			Area = ai,
 			Rarity = rarity,
 			BaseIncome = math.max(1, math.floor(income * 10) / 10),
-			Description = `A {Catalog.Rarities[rarity].Name:lower()} animal found in the {def[1]}.`,
+			Description = `A {Catalog.Rarities[rarity].Name:lower()} character who lives in {def[1]}.`,
 		}
 		Catalog.Animals[id] = animal
 		table.insert(Catalog.AnimalList, animal)
@@ -117,11 +127,12 @@ for _, def in foodDefs do
 		Id = id,
 		Name = def[2],
 		Emoji = def[3],
+		Icon = FOOD_ICON[def[2]],
 		Tier = tier,
 		Price = math.floor(8 * 3.2 ^ (tier - 1) * (1 + 0.3 * (k - 1))),
 		RequiredLevel = (tier - 1) * 4 + k,
 		Boost = 1 + 0.25 * (tier - 1),
-		Description = `Draws {Catalog.Rarities[tier].Name} animals and rarer.`,
+		Description = `Draws {Catalog.Rarities[tier].Name} characters and rarer.`,
 	}
 	Catalog.Foods[id] = food
 	table.insert(Catalog.FoodList, food)
@@ -130,7 +141,7 @@ end
 Catalog.Upgrades = {
 	Strength = { Name = "Strength Boost", Icon = "💪", Desc = "+5 Throw Power", Base = 100, Growth = 1.35, Max = 500, Gain = 5 },
 	Luck = { Name = "Lucky Charm", Icon = "🍀", Desc = "+1 Luck", Base = 250, Growth = 1.6, Max = 60, Gain = 1 },
-	Slots = { Name = "Habitat Slot", Icon = "🏡", Desc = "+1 habitat slot", Base = 500, Growth = 2.1, Max = 24, Gain = 1 },
+	Slots = { Name = "Team Slot", Icon = "🏯", Desc = "+1 team slot", Base = 500, Growth = 2.1, Max = 24, Gain = 1 },
 }
 Catalog.UpgradeOrder = { "Strength", "Luck", "Slots" }
 
@@ -151,6 +162,10 @@ end
 
 function Catalog.xpNeeded(level)
 	return math.floor(60 * level ^ 1.5)
+end
+
+function Catalog.sellPrice(animalId, sizeName)
+	return math.max(1, math.floor(Catalog.income(animalId, sizeName) * 45))
 end
 
 function Catalog.income(animalId, sizeName)

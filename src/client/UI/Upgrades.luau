@@ -159,7 +159,7 @@ function Upgrades.Init()
 				row.btn.SetStyle("locked")
 			else
 				local cost = Catalog.upgradeCost(kind, owned)
-				row.btn.SetText(`{Theme.Icons.Money} {Util.fmt(cost)}`)
+				row.btn.SetText(`${Util.fmt(cost)}`)
 				row.btn.SetStyle(money >= cost and "good" or "gold")
 			end
 		end

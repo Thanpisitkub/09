@@ -24,8 +24,24 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # lets the job save assets/icon_ids.json
     steps:
       - uses: actions/checkout@v4
+
+      - name: Upload new icons (skipped if the key has no Assets permission)
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_USER_ID: ${{ vars.ROBLOX_USER_ID }}
+          ROBLOX_GROUP_ID: ${{ vars.ROBLOX_GROUP_ID }}
+        run: python3 tools/upload_icons.py
+
+      - name: Save icon ids
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f assets/icon_ids.json ]; then git add assets/icon_ids.json; fi
+          git diff --cached --quiet || { git commit -m "Update icon ids" && git push; }
 
       - name: Install Rojo
         env:
@@ -39,7 +55,7 @@ jobs:
           rojo --version
 
       - name: Build place file
-        run: mkdir -p build && rojo build default.project.json --output build/game.rbxl
+        run: rojo build default.project.json --output build/game.rbxl
 
       - name: Check the secrets are set
         env:

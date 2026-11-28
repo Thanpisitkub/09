@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EVENTS = {
 	"RequestState", "Inventory", "Notify", "ThrowFood", "ThrowResult",
 	"BuyFood", "EquipFood", "UpgradeStat", "TrainRep",
-	"PlaceAnimal", "RemoveAnimal", "EquipBest", "CollectAll",
+	"PlaceAnimal", "RemoveAnimal", "SellAnimal", "EquipBest", "CollectAll",
 	"AdminStatus", "AdminPlayersChanged",
 }
 local FUNCTIONS = { "AdminInit", "AdminPlayers", "AdminRequest", "AdminConfirm", "AdminPermList", "AdminLogs" }

@@ -8,14 +8,14 @@ local registry = {}
 function Windows.Init()
 	local pg = Players.LocalPlayer:WaitForChild("PlayerGui")
 	local function screen(name, order)
-		return Kit.new("ScreenGui", {
+		return Kit.safe(Kit.new("ScreenGui", {
 			Name = name,
 			ResetOnSpawn = false,
 			IgnoreGuiInset = true,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			DisplayOrder = order,
 			Parent = pg,
-		})
+		}))
 	end
 	Windows.gui = screen("Windows", 10)
 	Windows.overlay = screen("Overlay", 100)

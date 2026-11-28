@@ -37,6 +37,7 @@ function FoodBag.Init()
 				Parent = grid,
 				LayoutOrder = i,
 				Emoji = f.Emoji,
+				Icon = f.Icon,
 				Title = f.Name,
 				Rarity = f.Tier,
 				Sub = `x{item.count}`,

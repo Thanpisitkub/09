@@ -28,6 +28,7 @@ function Collection.Init()
 				Parent = grid,
 				LayoutOrder = i,
 				Emoji = seen and animal.Emoji or "❔",
+				Icon = seen and animal.Icon or nil,
 				Title = seen and animal.Name or "???",
 				Rarity = seen and animal.Rarity or nil,
 				Sub = seen and `{area.Name} · {Util.fmt(animal.BaseIncome)}/s` or area.Name,
@@ -39,7 +40,7 @@ function Collection.Init()
 	end
 
 	win = Windows.create("Collection", {
-		Title = "Collection Book",
+		Title = "Character Index",
 		Icon = Theme.Icons.Collection,
 		Accent = Color3.fromHex("A66BFF"),
 		OnOpen = rebuild,

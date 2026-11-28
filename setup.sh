@@ -26,6 +26,7 @@ read -rp "Repo (ชื่อผู้ใช้/ชื่อ repo) [Thanpisitkub/
 REPO="${REPO:-Thanpisitkub/09}"
 read -rp "Universe ID: " UNIVERSE
 read -rp "Place ID: " PLACE
+read -rp "Roblox User ID (เลขในลิงก์โปรไฟล์ roblox.com/users/เลข/profile; เว้นว่างได้ = ใช้อีโมจิแทนไอคอน): " ROBLOX_UID
 read -rsp "Roblox API Key (พิมพ์แล้วจะไม่แสดงบนจอ): " KEY
 echo
 
@@ -50,6 +51,7 @@ fi
 
 gh variable set ROBLOX_UNIVERSE_ID --body "$UNIVERSE" -R "$REPO"
 gh variable set ROBLOX_PLACE_ID --body "$PLACE" -R "$REPO"
+[ -n "$ROBLOX_UID" ] && gh variable set ROBLOX_USER_ID --body "$ROBLOX_UID" -R "$REPO"
 printf '%s' "$KEY" | gh secret set ROBLOX_API_KEY -R "$REPO"
 
 git push -u origin main --force

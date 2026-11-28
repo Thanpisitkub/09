@@ -6,7 +6,6 @@ local Windows = require(script.Parent.Windows)
 local C, F = Theme.Color, Theme.Font
 
 local Settings = {}
-Settings.Values = { Marker = true } -- read by the throw controller
 
 local function group(name)
 	local g = SoundService:FindFirstChild(name)
@@ -62,19 +61,6 @@ function Settings.Init()
 		})
 	end
 
-	local slot = row("Landing marker")
-	local toggle
-	toggle = Kit.button({
-		Parent = slot,
-		Size = UDim2.fromOffset(110, 44),
-		Text = "ON",
-		Style = "good",
-		OnClick = function()
-			Settings.Values.Marker = not Settings.Values.Marker
-			toggle.SetText(Settings.Values.Marker and "ON" or "OFF")
-			toggle.SetStyle(Settings.Values.Marker and "good" or "locked")
-		end,
-	})
 end
 
 return Settings

@@ -78,7 +78,7 @@ function Throw.Init()
 			return Economy.notify(player, "error", "You have no food equipped")
 		end
 		if #p.Animals >= Config.MaxAnimals then
-			return Economy.notify(player, "error", "Animal storage is full")
+			return Economy.notify(player, "error", "Team storage is full")
 		end
 		local character = player.Character
 		local root = character and character:FindFirstChild("HumanoidRootPart")

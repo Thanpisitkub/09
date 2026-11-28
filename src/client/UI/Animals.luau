@@ -24,7 +24,7 @@ function Animals.Init()
 			return Catalog.income(a.id, a.size) > Catalog.income(b.id, b.size)
 		end)
 		empty.Visible = #list == 0
-		info.Text = `{Theme.Icons.Money} {Util.fmt(State.get("Income"))}/s   ·   Habitat {State.get("Placed")}/{State.get("Slots")}   ·   {#list} animals`
+		info.Text = `Income ${Util.fmt(State.get("Income"))}/s   ·   Team {State.get("Placed")}/{State.get("Slots")}   ·   {#list} characters`
 		for i = 1, math.min(#list, MAX_TILES) do
 			local a = list[i]
 			local animal = Catalog.Animals[a.id]
@@ -33,25 +33,37 @@ function Animals.Init()
 				Parent = grid,
 				LayoutOrder = i,
 				Emoji = animal.Emoji,
+				Icon = animal.Icon,
 				Title = animal.Name,
 				Rarity = animal.Rarity,
 				Sub = `<font color="#{size.Color:ToHex()}">{size.Name}</font> · {Util.fmt(Catalog.income(a.id, a.size))}/s`,
 			})
 			Kit.button({
 				Parent = tile.Action,
-				Size = UDim2.fromScale(1, 1),
+				Size = UDim2.new(0.58, -3, 1, 0),
 				Text = a.placed and "Remove" or "Place",
-				TextSize = 17,
+				TextSize = 15,
 				Style = a.placed and "danger" or "good",
 				OnClick = function()
 					Net.event(a.placed and "RemoveAnimal" or "PlaceAnimal"):FireServer(a.uid)
+				end,
+			})
+			Kit.button({
+				Parent = tile.Action,
+				Position = UDim2.new(0.58, 3, 0, 0),
+				Size = UDim2.new(0.42, -3, 1, 0),
+				Text = "Sell",
+				TextSize = 15,
+				Style = "gold",
+				OnClick = function()
+					Net.event("SellAnimal"):FireServer(a.uid)
 				end,
 			})
 		end
 	end
 
 	win = Windows.create("Animals", {
-		Title = "My Animals",
+		Title = "My Team",
 		Icon = Theme.Icons.Animals,
 		Accent = C.Leaf,
 		OnOpen = rebuild,
@@ -98,7 +110,7 @@ function Animals.Init()
 		Parent = win.Content,
 		Position = UDim2.fromOffset(0, 52),
 		Size = UDim2.new(1, 0, 1, -52),
-		Text = "No animals yet.\nThrow some food to attract your first one!",
+		Text = "No characters yet.\nThrow some food and see who shows up!",
 		Font = F.Display,
 		TextSize = 20,
 		TextColor3 = C.InkSoft,

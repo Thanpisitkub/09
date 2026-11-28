@@ -17,6 +17,10 @@ function WorldClient.Init()
 	local player = Players.LocalPlayer
 
 	ProximityPromptService.PromptTriggered:Connect(function(prompt)
+		if prompt:GetAttribute("Action") == "Throw" then
+			require(script.Parent.Throw).throwNow()
+			return
+		end
 		local window = prompt:GetAttribute("Window")
 		if window then
 			Windows.toggle(window)

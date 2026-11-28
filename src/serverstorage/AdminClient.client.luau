@@ -412,8 +412,8 @@ local function transact(kind, target, value)
 	local who = `<b>{res.targetDisplay}</b> (@{res.targetName})`
 	local body, title
 	if kind == "Animal" then
-		title = "Give animal"
-		body = `Selected Player: <b>{res.targetDisplay}</b>\nSelected Animal: <b>{res.animalName}</b>\nAnimal Rarity: <b>{res.rarity}</b>`
+		title = "Give character"
+		body = `Selected Player: <b>{res.targetDisplay}</b>\nSelected Character: <b>{res.animalName}</b>\nCharacter Rarity: <b>{res.rarity}</b>`
 	elseif kind == "GrantAdmin" then
 		title = "Grant admin access"
 		body = `Are you sure you want to grant Admin access to {who}?`
@@ -461,7 +461,7 @@ local function givePage(kind, label)
 	card = targetCard(right, UDim2.new())
 
 	if kind == "Animal" then
-		local search = inputBox(right, "Search animals, areas or rarity…", UDim2.fromOffset(0, 82), UDim2.new(1, 0, 0, 36))
+		local search = inputBox(right, "Search characters, zones or rarity…", UDim2.fromOffset(0, 82), UDim2.new(1, 0, 0, 36))
 		local grid = Kit.scroll({ Parent = right, Position = UDim2.fromOffset(0, 126), Size = UDim2.new(1, 0, 1, -126), Cell = Vector2.new(104, 112), Pad = 8, BarColor = A.Muted })
 		local function build()
 			for _, c in grid:GetChildren() do
@@ -512,7 +512,7 @@ end
 givePage("Strength", "Give Strength")
 givePage("Luck", "Give Luck")
 givePage("Money", "Give Money")
-givePage("Animal", "Give Animals")
+givePage("Animal", "Give Characters")
 
 -- Action log (+ permission history for the creator)
 local logPage = addPage("Log", "Action Log")

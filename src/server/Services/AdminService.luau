@@ -145,7 +145,7 @@ local function request(player, kind, targetUserId, value)
 		elseif kind == "Animal" then
 			local animal = typeof(value) == "string" and Catalog.Animals[value]
 			if not animal then
-				return fail("Unknown animal")
+				return fail("Unknown character")
 			end
 			tx.animalId = animal.Id
 			summary.animalName = animal.Name

@@ -6,17 +6,17 @@ end
 local Theme = {}
 
 Theme.Color = {
-	Ink = hex("14363B"),
-	InkSoft = hex("2C5B61"),
-	Paper = hex("FFF4DC"),
-	PaperDark = hex("F1DDB0"),
+	Ink = hex("251B4A"),
+	InkSoft = hex("5B4B8A"),
+	Paper = hex("FFF3F8"),
+	PaperDark = hex("F6DDEA"),
 	White = hex("FFFFFF"),
-	Pumpkin = hex("FF8F2B"), PumpkinLip = hex("C95F0A"),
+	Pumpkin = hex("FF5C9A"), PumpkinLip = hex("C93A74"),
 	Leaf = hex("4CCB5E"), LeafLip = hex("2C9440"),
-	Berry = hex("F2546E"), BerryLip = hex("B82C45"),
-	Sky = hex("52C1F5"), SkyLip = hex("2A8DBF"),
+	Berry = hex("F2445E"), BerryLip = hex("B02040"),
+	Sky = hex("4DB8FF"), SkyLip = hex("2A86CC"),
 	Butter = hex("FFD43B"), ButterLip = hex("D1A100"),
-	Stone = hex("A9B4B2"), StoneLip = hex("7C8886"),
+	Stone = hex("B0A8C8"), StoneLip = hex("857DA0"),
 }
 
 Theme.Font = {
@@ -27,12 +27,12 @@ Theme.Font = {
 
 Theme.Radius = { Sm = 10, Md = 16, Lg = 24 }
 
--- Swap any of these for an image asset id later (Kit reads text only for now).
+-- Icon KEYS (see Icons.luau). Kit renders the uploaded image, or an emoji if no asset id exists yet.
 Theme.Icons = {
-	Money = "🪙", Level = "⭐", Power = "💪", Luck = "🍀",
-	Shop = "🛒", Animals = "🐾", Food = "🎒", Areas = "🗺️",
-	Upgrades = "⚡", Collection = "📖", Settings = "⚙️", Throw = "🎯",
-	Lock = "🔒", Admin = "🛡️",
+	Money = "Coin", Level = "Star", Power = "Arm", Luck = "Clover",
+	Shop = "Shop", Animals = "Paw", Food = "Backpack", Areas = "Planet",
+	Upgrades = "Upgrade", Collection = "Book", Settings = "Settings", Throw = "Arm",
+	Lock = "Lock", Admin = "🛡️",
 }
 
 -- Admin tooling is deliberately a different visual language: calm, dark, dense.

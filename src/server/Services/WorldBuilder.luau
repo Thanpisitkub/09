@@ -107,163 +107,274 @@ function P.tree(f, x, z, trunk, leaves, h, d)
 	ball(f, x, h + d * 0.3, z, d, d * 0.85, d, jitter(leaves, 0.12), Enum.Material.Grass)
 end
 
+-- anime building blocks
+function P.torii(f, x, z, k, color)
+	k = k or 1
+	color = color or c("D7263D")
+	cylinder(f, x - 4 * k, 6 * k, z, 12 * k, 1.5 * k, color, Enum.Material.Wood)
+	cylinder(f, x + 4 * k, 6 * k, z, 12 * k, 1.5 * k, color, Enum.Material.Wood)
+	block(f, x, 12.4 * k, z, 13.5 * k, 1.2 * k, 1.8 * k, c("1E1E1E"))
+	block(f, x, 10 * k, z, 10 * k, 0.9 * k, 1.1 * k, color)
+end
+
+function P.lantern(f, x, z, glow)
+	cylinder(f, x, 1.5, z, 3, 1.2, c("9AA0A6"), Enum.Material.Slate)
+	block(f, x, 3.5, z, 2.2, 1.7, 2.2, glow or c("FFD27A"), Enum.Material.Neon)
+	block(f, x, 4.7, z, 3.4, 0.6, 3.4, c("6B7075"), Enum.Material.Slate)
+end
+
+function P.house(f, x, z, wall, roof)
+	block(f, x, 3.5, z, 10, 7, 9, wall, Enum.Material.WoodPlanks)
+	block(f, x, 7.9, z, 12.6, 1.6, 11.6, roof, Enum.Material.Slate)
+	block(f, x, 2, z + 4.6, 2.4, 4, 0.3, c("3E2723"))
+end
+
+function P.sakura(f, x, z)
+	local h = rng:NextInteger(8, 12)
+	cylinder(f, x, h / 2, z, h, 1.6, c("6D4C41"), Enum.Material.Wood)
+	ball(f, x, h + 2, z, 13, 9, 13, jitter(c("FFB7D5"), 0.1), Enum.Material.SmoothPlastic)
+	ball(f, x + 4, h, z + 2, 8, 6, 8, jitter(c("FF9EC4"), 0.1))
+	ball(f, x - 4, h + 0.5, z - 2, 7, 5, 7, jitter(c("FFC9E0"), 0.1))
+end
+
+function P.bamboo(f, x, z)
+	for i = -1, 1 do
+		local h = rng:NextInteger(14, 20)
+		cylinder(f, x + i * 1.7, h / 2, z + rng:NextInteger(-1, 1), h, 0.9, jitter(c("5FAF4F"), 0.15), Enum.Material.Grass)
+	end
+end
+
+function P.pine(f, x, z)
+	cylinder(f, x, 3, z, 6, 1.4, c("5D4037"), Enum.Material.Wood)
+	for i = 0, 2 do
+		cylinder(f, x, 7 + i * 3.2, z, 1.6, 11 - i * 3, c("2E7D32"), Enum.Material.Grass)
+	end
+end
+
+function P.tower(f, x, z, wall, roof)
+	cylinder(f, x, 10, z, 20, 7, wall, Enum.Material.Marble)
+	cylinder(f, x, 21, z, 1.5, 10, roof, Enum.Material.SmoothPlastic)
+	cylinder(f, x, 24, z, 4, 6, roof, Enum.Material.SmoothPlastic)
+	cylinder(f, x, 27, z, 3, 2.4, roof, Enum.Material.SmoothPlastic)
+end
+
+function P.crystal(f, x, z, color, h)
+	h = h or rng:NextInteger(6, 12)
+	block(f, x, h / 2, z, 2.4, h, 2.4, color, Enum.Material.Neon, CFrame.Angles(math.rad(rng:NextInteger(-12, 12)), math.rad(rng:NextInteger(0, 90)), math.rad(rng:NextInteger(-12, 12))))
+end
+
+function P.skyscraper(f, x, z, color, neon)
+	local h = rng:NextInteger(22, 46)
+	local w = rng:NextInteger(9, 15)
+	block(f, x, h / 2, z, w, h, w, color, Enum.Material.Concrete)
+	block(f, x, h * 0.35, z + w / 2 + 0.1, w * 0.8, 1, 0.3, neon, Enum.Material.Neon).CanCollide = false
+	block(f, x, h * 0.7, z + w / 2 + 0.1, w * 0.8, 1, 0.3, neon, Enum.Material.Neon).CanCollide = false
+	block(f, x, h + 0.6, z, w * 0.5, 1.2, w * 0.5, neon, Enum.Material.Neon).CanCollide = false
+end
+
+function P.sign(f, x, z, text, color)
+	local post = part(f, { Size = Vector3.new(0.8, 10, 0.8), Position = Vector3.new(x, 5, z), Color = c("2B2B3A"), CanCollide = false })
+	local board = block(f, x, 11, z, 8, 3.2, 0.6, c("141224"), Enum.Material.Neon)
+	board.CanCollide = false
+	billboard(board, text, UDim2.fromOffset(150, 60), color, 160, 0)
+	post.Name = "SignPost"
+end
+
+local NEON = { c("FF4FA3"), c("29E0FF"), c("B26BFF"), c("FFE14D"), c("5CFF9D") }
+local SIGNS = { "RAMEN", "GAME", "IDOL", "24H", "NEON", "MANGA" }
+
 local ZONE_PROPS = {
-	function(f, x, z) -- 1 Green Meadow
+	function(f, x, z) -- 1 Sakura Village
+		local r = rng:NextNumber()
+		if r < 0.42 then
+			P.sakura(f, x, z)
+		elseif r < 0.55 then
+			P.lantern(f, x, z)
+		elseif r < 0.67 then
+			P.house(f, x, z, c("F3E6CF"), c("B24A4A"))
+		elseif r < 0.75 then
+			P.torii(f, x, z, 0.7)
+		else
+			ball(f, x, 0.5, z, 1.4, 0.6, 1.4, pick({ c("FFB7D5"), c("FFFFFF"), c("FF9EC4") }), nil, false)
+		end
+	end,
+	function(f, x, z) -- 2 Ninja Dojo Hills
+		local r = rng:NextNumber()
+		if r < 0.42 then
+			P.bamboo(f, x, z)
+		elseif r < 0.62 then
+			cylinder(f, x, 3.5, z, 7, 1.6, c("8D6E63"), Enum.Material.Wood)
+			ball(f, x, 5.5, z + 1.2, 2.6, 3.4, 2.6, c("D7B98E"), Enum.Material.Fabric)
+		elseif r < 0.78 then
+			P.house(f, x, z, c("6D4C41"), c("2E7D32"))
+		else
+			ball(f, x, 1.5, z, 5, 3, 4, jitter(c("8A8F94"), 0.15), Enum.Material.Rock)
+		end
+	end,
+	function(f, x, z) -- 3 Samurai Castle
+		local r = rng:NextNumber()
+		if r < 0.28 then
+			P.pine(f, x, z)
+		elseif r < 0.5 then
+			block(f, x, 3.5, z, 16, 7, 3, c("B9B2A3"), Enum.Material.Slate)
+			for i = -2, 2 do
+				block(f, x + i * 3.4, 7.8, z, 1.8, 1.6, 3, c("B9B2A3"), Enum.Material.Slate)
+			end
+		elseif r < 0.68 then
+			cylinder(f, x, 7, z, 14, 0.8, c("3E2723"), Enum.Material.Wood)
+			block(f, x + 2.6, 11, z, 5, 3.4, 0.3, c("C62828"), Enum.Material.Fabric)
+		elseif r < 0.82 then
+			P.lantern(f, x, z)
+		else
+			for i = 0, 2 do
+				block(f, x, 3 + i * 5, z, 12 - i * 2.4, 3, 12 - i * 2.4, c("F3E6CF"), Enum.Material.WoodPlanks)
+				block(f, x, 5.2 + i * 5, z, 15 - i * 2.4, 0.9, 15 - i * 2.4, c("37474F"), Enum.Material.Slate)
+			end
+		end
+	end,
+	function(f, x, z) -- 4 Magic Academy
+		local r = rng:NextNumber()
+		if r < 0.28 then
+			P.tower(f, x, z, c("E8E0FF"), c("6A3FD0"))
+		elseif r < 0.55 then
+			P.crystal(f, x, z, pick({ c("B28DFF"), c("5CF2E6"), c("FF8AD8") }))
+			P.crystal(f, x + 2.4, z + 1, pick({ c("B28DFF"), c("5CF2E6") }), 5)
+		elseif r < 0.78 then
+			local book = block(f, x, rng:NextInteger(7, 16), z, 4, 0.7, 3, pick({ c("5CF2E6"), c("FFE14D") }), Enum.Material.Neon, CFrame.Angles(math.rad(rng:NextInteger(-20, 20)), math.rad(rng:NextInteger(0, 90)), 0))
+			book.CanCollide = false
+		else
+			ball(f, x, rng:NextInteger(5, 14), z, 2.4, 2.4, 2.4, c("FFE14D"), Enum.Material.Neon, false)
+		end
+	end,
+	function(f, x, z) -- 5 Spirit Shrine
+		local r = rng:NextNumber()
+		if r < 0.32 then
+			P.torii(f, x, z, 0.85)
+		elseif r < 0.5 then
+			P.lantern(f, x, z, c("7FDBFF"))
+		elseif r < 0.7 then
+			block(f, x, 2.4, z, 4, 4.8, 3, c("F5F5F5"), Enum.Material.Marble)
+			block(f, x - 1.2, 5.6, z, 1, 1.8, 1, c("F5F5F5"), Enum.Material.Marble)
+			block(f, x + 1.2, 5.6, z, 1, 1.8, 1, c("F5F5F5"), Enum.Material.Marble)
+			block(f, x, 3.4, z + 1.55, 3.2, 1.2, 0.2, c("D7263D"), Enum.Material.Fabric)
+		else
+			local wisp = ball(f, x, rng:NextInteger(4, 12), z, 2.2, 2.2, 2.2, c("7FDBFF"), Enum.Material.Neon, false)
+			if rng:NextNumber() < 0.25 then
+				local light = Instance.new("PointLight")
+				light.Color, light.Range, light.Brightness = c("7FDBFF"), 14, 1.2
+				light.Parent = wisp
+			end
+		end
+	end,
+	function(f, x, z) -- 6 Pirate Seas
 		local r = rng:NextNumber()
 		if r < 0.3 then
-			P.tree(f, x, z, c("7A5230"), c("3FA34D"), rng:NextInteger(6, 9), rng:NextInteger(7, 10))
-		elseif r < 0.6 then
-			ball(f, x, 1.4, z, 3.5, 2.8, 3.5, jitter(c("4FB85C"), 0.15), Enum.Material.Grass)
-		else
-			ball(f, x, 0.6, z, 1.3, 1.3, 1.3, pick({ c("FF7BAC"), c("FFE066"), c("FFFFFF"), c("9AD1FF") }), nil, false)
-		end
-	end,
-	function(f, x, z) -- 2 Sunny Farm
-		local r = rng:NextNumber()
-		if r < 0.35 then
-			local hay = cylinder(f, x, 1.8, z, 5, 3.6, c("E6C45A"), Enum.Material.Fabric)
-			hay.CFrame = CFrame.new(x, 1.8, z) * CFrame.Angles(math.pi / 2, 0, 0) * UP
-		elseif r < 0.8 then
-			for i = -1, 1 do
-				block(f, x + i * 4, 1.6, z, 0.7, 3.2, 0.7, c("8B5A2B"), Enum.Material.Wood)
+			block(f, x, 2.5, z, 9, 4, 24, c("6D4C41"), Enum.Material.WoodPlanks)
+			cylinder(f, x, 11, z, 14, 0.9, c("3E2723"), Enum.Material.Wood)
+			block(f, x, 11.5, z + 0.2, 0.4, 9, 8, c("FFF8E7"), Enum.Material.Fabric)
+			block(f, x, 18.4, z, 0.3, 2, 3, c("111111"), Enum.Material.Fabric)
+		elseif r < 0.55 then
+			for i = 0, 2 do
+				cylinder(f, x + i * 2.2, 1.4, z + (i % 2) * 1.6, 2.8, 2.2, c("8D6E63"), Enum.Material.Wood)
 			end
-			block(f, x, 2.4, z, 9, 0.5, 0.4, c("A56B35"), Enum.Material.Wood)
-			block(f, x, 1.2, z, 9, 0.5, 0.4, c("A56B35"), Enum.Material.Wood)
-		else
-			block(f, x, 5, z, 14, 10, 12, c("C0392B"), Enum.Material.WoodPlanks)
-			block(f, x, 10.6, z, 16, 1.4, 14, c("5A2D1F"), Enum.Material.Wood)
-			block(f, x, 2.6, z + 6.05, 5, 5.2, 0.3, c("FFF4DC"), Enum.Material.Wood)
-		end
-	end,
-	function(f, x, z) -- 3 Tropical Jungle
-		if rng:NextNumber() < 0.6 then
-			local h = rng:NextInteger(14, 20)
-			cylinder(f, x, h / 2, z, h, 2.2, c("5A3A22"), Enum.Material.Wood)
-			ball(f, x, h + 3, z, 13, 8, 13, jitter(c("1F7A3A"), 0.12), Enum.Material.Grass)
-			ball(f, x + 3, h + 1, z - 2, 8, 5, 8, jitter(c("2E9B4E"), 0.12), Enum.Material.Grass)
-		else
-			ball(f, x, 1, z, 6, 2.4, 6, jitter(c("2FB05A"), 0.15), Enum.Material.Grass)
-		end
-	end,
-	function(f, x, z) -- 4 Desert Kingdom
-		local r = rng:NextNumber()
-		if r < 0.4 then
-			local h = rng:NextInteger(6, 10)
-			cylinder(f, x, h / 2, z, h, 1.8, c("3F8F4E"), Enum.Material.Grass)
-			cylinder(f, x + 2.2, h * 0.55, z, 3, 1.1, c("3F8F4E"), Enum.Material.Grass)
-			ball(f, x, h, z, 1.8, 1.8, 1.8, c("3F8F4E"), Enum.Material.Grass)
 		elseif r < 0.75 then
-			ball(f, x, 1.5, z, 5, 3, 4, jitter(c("A68B6A"), 0.15), Enum.Material.Rock)
-		else
-			ball(f, x, 1.5, z, rng:NextInteger(24, 36), 7, rng:NextInteger(18, 26), c("E6BE70"), Enum.Material.Sand)
-		end
-	end,
-	function(f, x, z) -- 5 Frozen Mountains
-		local r = rng:NextNumber()
-		if r < 0.4 then
-			local h = rng:NextInteger(8, 16)
-			block(f, x, h / 2, z, 2.6, h, 2.6, c("BFE8FF"), Enum.Material.Ice, CFrame.Angles(0, math.rad(rng:NextInteger(0, 90)), math.rad(rng:NextInteger(-8, 8))))
-		elseif r < 0.75 then
-			ball(f, x, 1.5, z, rng:NextInteger(10, 18), 5, rng:NextInteger(8, 14), c("FFFFFF"), Enum.Material.Snow)
-		else
-			ball(f, x, 2, z, 4, 4, 4, c("FFFFFF"), Enum.Material.Snow)
-			ball(f, x, 5, z, 3, 3, 3, c("FFFFFF"), Enum.Material.Snow)
-			ball(f, x, 7.4, z, 2.2, 2.2, 2.2, c("FFFFFF"), Enum.Material.Snow)
-			ball(f, x, 7.4, z - 1.1, 0.5, 0.5, 1.2, c("FF8F2B"))
-		end
-	end,
-	function(f, x, z) -- 6 Deep Ocean
-		local r = rng:NextNumber()
-		if r < 0.35 then
-			ball(f, x, 1.2, z, 4, 3, 4, pick({ c("FF6F91"), c("FFB347"), c("B28DFF") }), Enum.Material.SmoothPlastic)
-			ball(f, x + 2, 1.8, z + 1, 3, 4, 3, pick({ c("FF6F91"), c("FFB347"), c("B28DFF") }))
-		elseif r < 0.65 then
 			cylinder(f, x, 1.6, z, 3.2, 2.4, c("E63946"))
 			cylinder(f, x, 3.4, z, 0.5, 2.5, c("FFFFFF"))
 		else
-			ball(f, x, 0.5, z, 20, 3, 16, c("F2D99B"), Enum.Material.Sand)
-			cylinder(f, x, 5, z, 8, 1, c("7A5230"), Enum.Material.Wood)
-			ball(f, x, 9.5, z, 7, 2, 7, c("2FB05A"), Enum.Material.Grass)
-		end
-	end,
-	function(f, x, z) -- 7 Volcanic Island
-		local r = rng:NextNumber()
-		if r < 0.35 then
-			cylinder(f, x, 0.35, z, 0.5, rng:NextInteger(8, 16), c("FF5A1F"), Enum.Material.Neon)
-		elseif r < 0.8 then
-			block(f, x, 5, z, 3, 10, 3, c("1E1515"), Enum.Material.Basalt, CFrame.Angles(math.rad(rng:NextInteger(-10, 10)), math.rad(rng:NextInteger(0, 90)), math.rad(rng:NextInteger(-10, 10))))
-		else
-			cylinder(f, x, 4, z, 8, 22, c("4A2E28"), Enum.Material.Basalt)
-			cylinder(f, x, 10, z, 6, 13, c("3A2420"), Enum.Material.Basalt)
-			cylinder(f, x, 13.2, z, 0.6, 7, c("FF5A1F"), Enum.Material.Neon)
-		end
-	end,
-	function(f, x, z) -- 8 Mystical Forest
-		local r = rng:NextNumber()
-		local glow = pick({ c("B28DFF"), c("5CF2E6"), c("FF8AD8") })
-		if r < 0.4 then
-			cylinder(f, x, 2, z, 4, 1, c("F4EEFF"))
-			local cap = ball(f, x, 4.4, z, 5, 3, 5, glow, Enum.Material.Neon)
-			if rng:NextNumber() < 0.2 then
-				local light = Instance.new("PointLight")
-				light.Color, light.Range, light.Brightness = glow, 14, 1.2
-				light.Parent = cap
+			for i = 0, 2 do
+				block(f, x, 0.5, z + i * 3.2, 7, 0.6, 2.8, c("A1887F"), Enum.Material.WoodPlanks)
 			end
-		elseif r < 0.7 then
-			block(f, x, 4, z, 2, 8, 2, glow, Enum.Material.Neon, CFrame.Angles(math.rad(rng:NextInteger(-15, 15)), math.rad(rng:NextInteger(0, 90)), math.rad(rng:NextInteger(-15, 15))))
-		else
-			P.tree(f, x, z, c("4B2E5E"), c("9B6BE0"), rng:NextInteger(8, 12), rng:NextInteger(9, 12))
 		end
 	end,
-	function(f, x, z) -- 9 Sky Kingdom
-		local r = rng:NextNumber()
-		if r < 0.55 then
-			for i = 1, 4 do
-				ball(f, x + (i - 2.5) * 3, 2 + (i % 2), z + rng:NextInteger(-2, 2), 6, 5, 6, c("FFFFFF"))
-			end
-		elseif r < 0.8 then
-			cylinder(f, x, 7, z, 14, 3, c("F5FBFF"), Enum.Material.Marble)
-			block(f, x, 14.4, z, 5, 1.2, 5, c("FFE066"), Enum.Material.Marble)
-		else
-			ball(f, x, rng:NextInteger(14, 28), z, 2.5, 2.5, 2.5, c("FFE066"), Enum.Material.Neon, false)
-		end
-	end,
-	function(f, x, z) -- 10 Ancient Kingdom
-		local r = rng:NextNumber()
-		if r < 0.4 then
-			local h = rng:NextInteger(12, 16)
-			cylinder(f, x, h / 2, z, h, 3, c("E3C98A"), Enum.Material.Sandstone)
-			block(f, x, h + 0.6, z, 4.4, 1.2, 4.4, c("C9A24A"), Enum.Material.Sandstone)
-		elseif r < 0.7 then
-			block(f, x, 2, z, rng:NextInteger(8, 14), 4, 2, c("CDB27A"), Enum.Material.Sandstone)
-		else
-			block(f, x, 3, z, 5, 6, 5, c("D4AF37"), Enum.Material.Metal)
-			ball(f, x, 7.2, z, 4, 4, 4, c("D4AF37"), Enum.Material.Metal)
-		end
-	end,
-	function(f, x, z) -- 11 Galaxy World
-		local r = rng:NextNumber()
-		if r < 0.5 then
-			ball(f, x, rng:NextInteger(6, 40), z, 1.4, 1.4, 1.4, c("FFFFFF"), Enum.Material.Neon, false)
-		elseif r < 0.8 then
-			local col = pick({ c("FF6FB5"), c("5CF2E6"), c("FFB347"), c("8F7BFF") })
-			local y = rng:NextInteger(28, 55)
-			ball(f, x, y, z, 14, 14, 14, col, Enum.Material.Neon, false)
-			cylinder(f, x, y, z, 0.6, 26, col, Enum.Material.Neon).CanCollide = false
-		else
-			ball(f, x, 3, z, 7, 5, 6, c("3B3B7A"), Enum.Material.Slate)
-		end
-	end,
-	function(f, x, z) -- 12 Divine Realm
+	function(f, x, z) -- 7 Neon Tokyo
 		local r = rng:NextNumber()
 		if r < 0.45 then
+			P.skyscraper(f, x, z, c("1F1B3A"), pick(NEON))
+		elseif r < 0.65 then
+			P.sign(f, x, z, pick(SIGNS), pick(NEON))
+		elseif r < 0.82 then
+			block(f, x, 3, z, 4, 6, 3, pick({ c("E53935"), c("1E88E5"), c("FDD835") }), Enum.Material.SmoothPlastic)
+			block(f, x, 3.6, z + 1.55, 3, 3.4, 0.2, c("B9F6FF"), Enum.Material.Neon).CanCollide = false
+		else
+			cylinder(f, x, 5, z, 10, 0.6, c("2B2B3A"))
+			ball(f, x, 10.4, z, 1.8, 1.8, 1.8, pick(NEON), Enum.Material.Neon, false)
+		end
+	end,
+	function(f, x, z) -- 8 Mecha Wasteland
+		local r = rng:NextNumber()
+		if r < 0.28 then
+			block(f, x, 6, z, 4, 12, 4, c("8FA1AC"), Enum.Material.Metal, CFrame.Angles(0, math.rad(rng:NextInteger(0, 90)), math.rad(rng:NextInteger(-18, 18))))
+			block(f, x + 1, 13, z, 6, 3, 5, c("FF7043"), Enum.Material.Metal)
+		elseif r < 0.55 then
+			for _ = 1, 3 do
+				block(f, x + rng:NextInteger(-3, 3), 1.5, z + rng:NextInteger(-3, 3), rng:NextInteger(3, 6), rng:NextInteger(2, 4), rng:NextInteger(3, 6), jitter(c("7B6B63"), 0.2), Enum.Material.CorrodedMetal, CFrame.Angles(0, math.rad(rng:NextInteger(0, 90)), 0))
+			end
+		elseif r < 0.72 then
+			ball(f, x, 8, z, 11, 10, 11, c("B0BEC5"), Enum.Material.Metal)
+			block(f, x, 8.6, z + 5.2, 8, 2.2, 0.8, c("FF5A1F"), Enum.Material.Neon).CanCollide = false
+		else
+			cylinder(f, x, 10, z, 20, 0.8, c("90A4AE"), Enum.Material.Metal)
+			ball(f, x, 20.5, z, 1.8, 1.8, 1.8, c("FF5A1F"), Enum.Material.Neon, false)
+		end
+	end,
+	function(f, x, z) -- 9 Demon Hunt Forest
+		local r = rng:NextNumber()
+		if r < 0.38 then
+			cylinder(f, x, 6, z, 12, 1.8, c("2A1F2D"), Enum.Material.Wood)
+			block(f, x + 2, 10, z, 6, 0.8, 0.8, c("2A1F2D"), Enum.Material.Wood, CFrame.Angles(0, 0, math.rad(25)))
+			block(f, x - 2, 9, z, 6, 0.8, 0.8, c("2A1F2D"), Enum.Material.Wood, CFrame.Angles(0, 0, math.rad(-25)))
+		elseif r < 0.65 then
+			for _ = 1, 3 do
+				ball(f, x + rng:NextInteger(-2, 2), 0.7, z + rng:NextInteger(-2, 2), 1.1, 1.1, 1.1, c("FF1744"), Enum.Material.Neon, false)
+			end
+		elseif r < 0.82 then
+			block(f, x, 2, z, 2.4, 4, 0.8, c("6B6B7A"), Enum.Material.Slate)
+		else
+			P.lantern(f, x, z, c("FF5252"))
+		end
+	end,
+	function(f, x, z) -- 10 Isekai Kingdom
+		local r = rng:NextNumber()
+		if r < 0.28 then
+			P.tower(f, x, z, c("F1F1F1"), c("2D9CDB"))
+		elseif r < 0.52 then
+			P.crystal(f, x, z, pick({ c("5CF2E6"), c("FFE14D"), c("FF8AD8") }), rng:NextInteger(10, 18))
+		elseif r < 0.74 then
+			local ring = part(f, { Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.8, 12, 12), Position = Vector3.new(x, 8, z), Color = pick({ c("B28DFF"), c("5CF2E6") }), Material = Enum.Material.Neon, CanCollide = false })
+			ring.Name = "Portal"
+		else
+			P.tree(f, x, z, c("6D4C41"), c("5CC96B"), rng:NextInteger(8, 12), rng:NextInteger(9, 13))
+		end
+	end,
+	function(f, x, z) -- 11 Hero Academy City
+		local r = rng:NextNumber()
+		if r < 0.45 then
+			P.skyscraper(f, x, z, c("7FA6D6"), c("FFFFFF"))
+		elseif r < 0.68 then
+			block(f, x, 4, z, 4, 8, 3, c("FFC107"), Enum.Material.Metal)
+			ball(f, x, 9.6, z, 3, 3, 3, c("FFC107"), Enum.Material.Metal)
+			block(f, x, 5, z - 1.8, 5, 8, 0.4, c("E53935"), Enum.Material.Fabric)
+		elseif r < 0.84 then
+			P.sign(f, x, z, "HERO", c("FFD43B"))
+		else
+			cylinder(f, x, 5, z, 10, 0.6, c("37474F"))
+			ball(f, x, 10.4, z, 1.8, 1.8, 1.8, c("FFFFFF"), Enum.Material.Neon, false)
+		end
+	end,
+	function(f, x, z) -- 12 Celestial Heaven
+		local r = rng:NextNumber()
+		if r < 0.3 then
 			local h = rng:NextInteger(16, 24)
 			cylinder(f, x, h / 2, z, h, 3, c("FFFBE0"), Enum.Material.Marble)
 			ball(f, x, h + 1, z, 3, 3, 3, c("FFE066"), Enum.Material.Neon)
-		elseif r < 0.75 then
-			cylinder(f, x, rng:NextInteger(20, 36), z, 0.7, 16, c("FFE066"), Enum.Material.Neon).CanCollide = false
+		elseif r < 0.55 then
+			cylinder(f, x, rng:NextInteger(18, 36), z, 0.7, 16, c("FFE066"), Enum.Material.Neon).CanCollide = false
+		elseif r < 0.78 then
+			for i = 1, 3 do
+				ball(f, x + (i - 2) * 3.4, 2 + (i % 2), z, 6, 4.5, 6, c("FFFFFF"))
+			end
 		else
-			ball(f, x, rng:NextInteger(3, 18), z, 2, 2, 2, c("FFFFFF"), Enum.Material.Neon, false)
+			ball(f, x, rng:NextInteger(6, 22), z, 2.2, 2.2, 2.2, c("FFF59D"), Enum.Material.Neon, false)
 		end
 	end,
 }
@@ -294,7 +405,7 @@ local function buildTrack(root)
 		local props = Instance.new("Folder")
 		props.Name = "Props" .. i
 		props.Parent = root
-		local count = math.clamp(math.floor(length / 5), 24, 70)
+		local count = math.clamp(math.floor(length / 6), 22, 56)
 		for _ = 1, count do
 			local x = (rng:NextNumber() - 0.5) * (WIDTH - 24)
 			local z = z1 + 14 + rng:NextNumber() * (length - 28)
@@ -331,7 +442,8 @@ local function buildHub(root)
 	local hub = Instance.new("Folder")
 	hub.Name = "Hub"
 	hub.Parent = root
-	part(hub, { Name = "HubGround", Size = Vector3.new(WIDTH, 4, W.HubDepth), Position = Vector3.new(0, -2, W.HubDepth / 2), Color = c("6FCF5A"), Material = Enum.Material.Grass })
+	part(hub, { Name = "HubGround", Size = Vector3.new(WIDTH, 4, W.HubDepth), Position = Vector3.new(0, -2, W.HubDepth / 2), Color = c("BFE8A8"), Material = Enum.Material.Grass })
+	P.torii(hub, 0, 2, 1.8, c("E53935")) -- grand entrance gate
 	-- path along the start line
 	part(hub, { Name = "StartLine", Size = Vector3.new(WIDTH, 0.2, 3), Position = Vector3.new(0, 0.1, 0), Color = c("FFF4DC"), CanCollide = false })
 	for _ = 1, 60 do
@@ -385,7 +497,7 @@ local function buildPlot(root, slot)
 	part(model, { Name = "Floor", Size = Vector3.new(48, 0.5, W.PlotDepth), Position = Vector3.new(x, 0.25, zc), Color = c("8FE06B"), Material = Enum.Material.Grass })
 	part(model, { Name = "Path", Size = Vector3.new(8, 0.6, W.PlotDepth - 8), Position = Vector3.new(x, 0.3, zc), Color = c("F1DDB0"), Material = Enum.Material.Cobblestone, CanCollide = false })
 
-	local wood = c("8B5A2B")
+	local wood = c("B03A2E")
 	rail(model, x - 24, z0, x - 24, z1, wood)
 	rail(model, x + 24, z0, x + 24, z1, wood)
 	rail(model, x - 24, z1, x + 24, z1, wood)
@@ -396,20 +508,36 @@ local function buildPlot(root, slot)
 	local penCenter = Vector3.new(x, 0.5, 54)
 	local penHalf = Vector2.new(17, 15)
 	part(model, { Name = "PenFloor", Size = Vector3.new(36, 0.2, 32), Position = Vector3.new(x, 0.6, 54), Color = c("B7E87A"), Material = Enum.Material.Grass, CanCollide = false })
-	rail(model, x - 18, 38, x + 18, 38, c("C98B4A"))
-	rail(model, x - 18, 70, x + 18, 70, c("C98B4A"))
-	rail(model, x - 18, 38, x - 18, 70, c("C98B4A"))
-	rail(model, x + 18, 38, x + 18, 70, c("C98B4A"))
+	rail(model, x - 18, 38, x + 18, 38, c("D9534F"))
+	rail(model, x - 18, 70, x + 18, 70, c("D9534F"))
+	rail(model, x - 18, 38, x - 18, 70, c("D9534F"))
+	rail(model, x + 18, 38, x + 18, 70, c("D9534F"))
 	local penSign = part(model, { Name = "PenSign", Size = Vector3.one, Position = Vector3.new(x, 8, 38), Transparency = 1, CanCollide = false })
-	billboard(penSign, "🐾 ANIMAL PEN", UDim2.fromOffset(240, 60), accent, 90, 0)
+	billboard(penSign, "🏯 TEAM DOJO", UDim2.fromOffset(240, 60), accent, 90, 0)
 
-	-- throw spot
+	-- checkered launch strip (tap the prompt, or press THROW)
 	local spot = ThrowMath.spot(slot)
-	local ring = cylinder(model, spot.X, 0.7, spot.Z, 0.3, 9, accent, Enum.Material.Neon)
-	ring.CanCollide = false
-	ring.Name = "ThrowSpot"
-	local ringLabel = part(model, { Size = Vector3.one, Position = spot + Vector3.new(0, 6, 0), Transparency = 1, CanCollide = false })
-	billboard(ringLabel, "THROW HERE", UDim2.fromOffset(220, 50), c("FFFFFF"), 120, 0)
+	for ix = 0, 15 do
+		for iz = 0, 1 do
+			part(model, {
+				Name = "Checker",
+				Size = Vector3.new(2, 0.3, 2),
+				Position = Vector3.new(spot.X - 15 + ix * 2, 0.65, spot.Z - 1 + iz * 2),
+				Color = (ix + iz) % 2 == 0 and c("14363B") or c("FFFFFF"),
+				CanCollide = false,
+			})
+		end
+	end
+	local launch = part(model, { Name = "LaunchPad", Size = Vector3.new(32, 0.3, 4), Position = Vector3.new(spot.X, 0.7, spot.Z), Transparency = 1, CanCollide = false })
+	local launchPrompt = Instance.new("ProximityPrompt")
+	launchPrompt.ActionText, launchPrompt.ObjectText = "TAP TO THROW!", "Launch strip"
+	launchPrompt.HoldDuration = 0
+	launchPrompt.MaxActivationDistance = 14
+	launchPrompt.RequiresLineOfSight = false
+	launchPrompt:SetAttribute("Action", "Throw")
+	launchPrompt.Parent = launch
+	local stripLabel = part(model, { Size = Vector3.one, Position = spot + Vector3.new(0, 6, 0), Transparency = 1, CanCollide = false })
+	billboard(stripLabel, "TAP TO THROW!", UDim2.fromOffset(240, 50), c("FFD43B"), 120, 0)
 
 	-- pull-up bar (training)
 	local bx, bz = x - 16, 20
@@ -424,11 +552,14 @@ local function buildPlot(root, slot)
 	-- food shop stand
 	local sx, sz = x + 16, 20
 	block(model, sx, 1.8, sz, 10, 3.2, 4, c("FFF4DC"), Enum.Material.WoodPlanks)
-	block(model, sx, 8, sz - 1.2, 11, 0.8, 6.5, accent, Enum.Material.Fabric, CFrame.Angles(math.rad(-10), 0, 0))
+	for k = 0, 7 do -- blue and white striped awning
+		block(model, sx - 5.25 + k * 1.5, 8, sz - 1.2, 1.5, 0.8, 6.5, k % 2 == 0 and c("E53935") or c("FFFFFF"), Enum.Material.Fabric, CFrame.Angles(math.rad(-10), 0, 0))
+	end
 	for _, dx in { -4.6, 4.6 } do
 		cylinder(model, sx + dx, 4.4, sz + 1.8, 8.8, 0.6, c("8B5A2B"), Enum.Material.Wood)
 	end
-	local shopPad = part(model, { Name = "ShopPad", Size = Vector3.new(12, 0.3, 5), Position = Vector3.new(sx, 0.65, sz - 4.5), Color = c("2C5B61"), CanCollide = false })
+	local shopPad = cylinder(model, sx, 0.7, sz - 4.5, 0.3, 9, c("FF5C9A"), Enum.Material.Neon) -- glowing entrance circle
+	shopPad.Name, shopPad.CanCollide = "ShopPad", false
 	prompt(shopPad, "Open", "Food Shop", "Shop")
 	local shopLabel = part(model, { Size = Vector3.one, Position = Vector3.new(sx, 11.5, sz), Transparency = 1, CanCollide = false })
 	billboard(shopLabel, "🛒 FOOD SHOP", UDim2.fromOffset(200, 44), c("52C1F5"), 90, 0)
@@ -437,9 +568,9 @@ local function buildPlot(root, slot)
 	local ax, az = x + 16, 34
 	block(model, ax, 2.6, az, 8, 5, 1, c("6C4B2A"), Enum.Material.Wood)
 	local animalsPad = part(model, { Name = "AnimalsPad", Size = Vector3.new(8, 0.3, 4), Position = Vector3.new(ax, 0.65, az - 3), Color = c("2C5B61"), CanCollide = false })
-	prompt(animalsPad, "Open", "My Animals", "Animals")
+	prompt(animalsPad, "Open", "My Team", "Animals")
 	local animalsLabel = part(model, { Size = Vector3.one, Position = Vector3.new(ax, 7.2, az), Transparency = 1, CanCollide = false })
-	billboard(animalsLabel, "🐾 ANIMALS", UDim2.fromOffset(180, 40), c("4CCB5E"), 80, 0)
+	billboard(animalsLabel, "🎴 TEAM", UDim2.fromOffset(180, 40), c("4CCB5E"), 80, 0)
 
 	local mx, mz = x - 16, 34
 	block(model, mx, 2.6, mz, 8, 5, 1, c("6C4B2A"), Enum.Material.Wood)
@@ -495,8 +626,8 @@ local function buildWalls(root)
 end
 
 local function buildLighting()
-	Lighting.ClockTime = 14
-	Lighting.Brightness = 2.6
+	Lighting.ClockTime = 17.3
+	Lighting.Brightness = 2.3
 	Lighting.GlobalShadows = true
 	Lighting.EnvironmentDiffuseScale = 0.5
 	for _, class in { "Atmosphere", "BloomEffect", "ColorCorrectionEffect", "SunRaysEffect", "Sky" } do
@@ -512,10 +643,11 @@ local function buildLighting()
 	atmosphere.Glare, atmosphere.Haze = 0.15, 1.2
 	atmosphere.Parent = Lighting
 	local bloom = Instance.new("BloomEffect")
-	bloom.Intensity, bloom.Size, bloom.Threshold = 0.35, 24, 1.6
+	bloom.Intensity, bloom.Size, bloom.Threshold = 0.5, 28, 1.4
 	bloom.Parent = Lighting
 	local cc = Instance.new("ColorCorrectionEffect")
-	cc.Saturation, cc.Contrast = 0.18, 0.06
+	cc.Saturation, cc.Contrast = 0.28, 0.08
+	cc.TintColor = c("FFF0F6")
 	cc.Parent = Lighting
 	local rays = Instance.new("SunRaysEffect")
 	rays.Intensity, rays.Spread = 0.06, 0.6

@@ -150,10 +150,10 @@ function Economy.giveAnimal(player, animalId, size)
 		return nil, "No profile"
 	end
 	if not Catalog.Animals[animalId] or not Catalog.SizeByName[size] then
-		return nil, "Unknown animal"
+		return nil, "Unknown character"
 	end
 	if #p.Animals >= Config.MaxAnimals then
-		return nil, "Animal storage is full"
+		return nil, "Team storage is full"
 	end
 	local uid = "a" .. p.NextUid
 	p.NextUid += 1
@@ -294,7 +294,7 @@ function Economy.Init()
 			return
 		end
 		if placedCount(p) >= p.Slots then
-			return Economy.notify(player, "error", "All habitat slots are full")
+			return Economy.notify(player, "error", "All team slots are full")
 		end
 		a.placed = true
 		recalc(player)
@@ -311,6 +311,25 @@ function Economy.Init()
 			a.placed = false
 			recalc(player)
 			pushInventory(player)
+		end
+	end)
+
+	Net.event("SellAnimal").OnServerEvent:Connect(function(player, uid)
+		local p = PlayerData.get(player)
+		if not p or typeof(uid) ~= "string" or not throttle(player, "sell", 0.2) then
+			return
+		end
+		for i, a in p.Animals do
+			if a.uid == uid then
+				local price = Catalog.sellPrice(a.id, a.size)
+				table.remove(p.Animals, i)
+				p.Money += price
+				recalc(player)
+				publish(player)
+				pushInventory(player)
+				Economy.notify(player, "reward", `Sold {Catalog.Animals[a.id].Name} for ${Util.fmt(price)}`)
+				return
+			end
 		end
 	end)
 

@@ -6,6 +6,8 @@ local Workspace = game:GetService("Workspace")
 
 local Theme = require(script.Parent.Theme)
 local Catalog = require(script.Parent.Catalog)
+local Icons = require(script.Parent.Icons)
+local GuiService = game:GetService("GuiService")
 local C, F = Theme.Color, Theme.Font
 
 local Kit = {}
@@ -72,6 +74,96 @@ function Kit.label(o)
 	return l
 end
 
+-- Image icon (or emoji fallback) sized by the caller.
+function Kit.icon(o)
+	local id = Icons.image(o.Key)
+	if id then
+		return new("ImageLabel", {
+			Name = o.Name or "Icon",
+			BackgroundTransparency = 1,
+			Image = id,
+			ScaleType = Enum.ScaleType.Fit,
+			Size = o.Size or UDim2.fromScale(1, 1),
+			Position = o.Position or UDim2.new(),
+			AnchorPoint = o.AnchorPoint or Vector2.zero,
+			LayoutOrder = o.LayoutOrder or 0,
+			Parent = o.Parent,
+		})
+	end
+	return Kit.label({
+		Name = o.Name or "Icon",
+		Parent = o.Parent,
+		Size = o.Size or UDim2.fromScale(1, 1),
+		Position = o.Position or UDim2.new(),
+		AnchorPoint = o.AnchorPoint or Vector2.zero,
+		LayoutOrder = o.LayoutOrder or 0,
+		Text = o.Emoji or Icons.emoji(o.Key) or "",
+		TextSize = o.TextSize or 24,
+	})
+end
+
+-- Round icon button (close, small actions) that pops on hover/press.
+function Kit.iconButton(o)
+	local id = Icons.image(o.Key)
+	local common = {
+		Name = o.Name or "IconButton",
+		AutoButtonColor = false,
+		Size = o.Size or UDim2.fromOffset(44, 44),
+		Position = o.Position or UDim2.new(),
+		AnchorPoint = o.AnchorPoint or Vector2.zero,
+		Parent = o.Parent,
+	}
+	local btn
+	if id then
+		common.BackgroundTransparency = 1
+		common.Image = id
+		common.ScaleType = Enum.ScaleType.Fit
+		btn = new("ImageButton", common)
+	else
+		common.BackgroundColor3 = C.Berry
+		common.Text = Icons.emoji(o.Key) or ""
+		common.Font = F.Display
+		common.TextSize = 22
+		common.TextColor3 = C.White
+		btn = new("TextButton", common)
+		Kit.corner(btn, 12)
+		Kit.stroke(btn, C.Ink, 3)
+	end
+	local scale = new("UIScale", { Parent = btn })
+	btn.MouseEnter:Connect(function()
+		Kit.tween(scale, 0.1, { Scale = 1.1 })
+	end)
+	btn.MouseLeave:Connect(function()
+		Kit.tween(scale, 0.1, { Scale = 1 })
+	end)
+	btn.MouseButton1Down:Connect(function()
+		Kit.tween(scale, 0.06, { Scale = 0.9 })
+	end)
+	btn.MouseButton1Up:Connect(function()
+		Kit.tween(scale, 0.1, { Scale = 1.1 })
+	end)
+	btn.Activated:Connect(function()
+		if o.OnClick then
+			o.OnClick()
+		end
+	end)
+	return btn
+end
+
+-- Phones get a relatively bigger HUD than desktops; the cluster also never overflows a narrow screen.
+function Kit.isTouch()
+	local UIS = game:GetService("UserInputService")
+	return UIS.TouchEnabled and not UIS.KeyboardEnabled
+end
+
+-- Make a ScreenGui respect notches and rounded corners.
+function Kit.safe(gui)
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+	end)
+	return gui
+end
+
 -- Scales an edge-anchored cluster so touch targets stay big on phones and
 -- the cluster never overflows a narrow portrait screen.
 function Kit.autoscale(frame, baseHeight, designWidth)
@@ -79,7 +171,8 @@ function Kit.autoscale(frame, baseHeight, designWidth)
 	local cam = Workspace.CurrentCamera or Workspace:WaitForChild("Camera")
 	local function update()
 		local vp = cam.ViewportSize
-		local s = math.clamp(vp.Y / baseHeight, 0.62, 1.25)
+		local base = Kit.isTouch() and baseHeight * 0.86 or baseHeight * 1.12
+		local s = math.clamp(vp.Y / base, 0.66, 1.3)
 		if designWidth then
 			s = math.min(s, (vp.X * 0.98) / designWidth)
 		end
@@ -147,6 +240,19 @@ function Kit.button(o)
 		RichText = o.RichText == true,
 		Stroke = lip,
 	})
+	if o.Icon then -- icon on top, caption underneath
+		label.Position = UDim2.fromScale(0, 0.64)
+		label.Size = UDim2.fromScale(1, 0.34)
+		local icon = Kit.icon({
+			Parent = face,
+			Key = o.Icon,
+			Size = UDim2.fromScale(0.6, 0.6),
+			Position = UDim2.fromScale(0.5, 0.04),
+			AnchorPoint = Vector2.new(0.5, 0),
+			TextSize = 26,
+		})
+		new("UIAspectRatioConstraint", { Parent = icon })
+	end
 
 	local obj = { Holder = holder, Face = face, Label = label, Enabled = true }
 	local pressed, hover = false, false
@@ -227,7 +333,14 @@ function Kit.pill(o)
 	})
 	Kit.corner(badge, 17)
 	Kit.stroke(badge, C.Ink, 2)
-	Kit.label({ Parent = badge, Text = o.Icon or "", TextSize = 19 })
+	Kit.icon({
+		Parent = badge,
+		Key = o.Icon,
+		Size = UDim2.fromScale(0.86, 0.86),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		TextSize = 19,
+	})
 	local value = Kit.label({
 		Name = "Value",
 		Parent = frame,
@@ -357,12 +470,21 @@ function Kit.window(o)
 		BorderSizePixel = 0,
 		Parent = header,
 	})
+	if o.Icon then
+		Kit.icon({
+			Parent = header,
+			Key = o.Icon,
+			Size = UDim2.fromOffset(42, 42),
+			Position = UDim2.fromOffset(12, 5),
+			TextSize = 28,
+		})
+	end
 	Kit.label({
 		Name = "Title",
 		Parent = header,
-		Position = UDim2.fromOffset(18, 0),
-		Size = UDim2.new(1, -80, 1, -3),
-		Text = (o.Icon and (o.Icon .. "  ") or "") .. o.Title,
+		Position = UDim2.fromOffset(o.Icon and 62 or 18, 0),
+		Size = UDim2.new(1, -120, 1, -3),
+		Text = o.Title,
 		Font = F.Display,
 		TextSize = 26,
 		TextColor3 = C.White,
@@ -414,15 +536,13 @@ function Kit.window(o)
 		end
 	end
 
-	Kit.button({
+	Kit.iconButton({
 		Name = "Close",
 		Parent = header,
-		Style = "danger",
-		Text = "✕",
-		TextSize = 20,
-		Size = UDim2.fromOffset(44, 44),
+		Key = "Close",
+		Size = UDim2.fromOffset(46, 46),
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -10, 0, 25),
+		Position = UDim2.new(1, -8, 0, 25),
 		OnClick = win.Close,
 	})
 
@@ -451,13 +571,26 @@ function Kit.scroll(o)
 		Parent = o.Parent,
 	})
 	if o.Cell then
-		new("UIGridLayout", {
+		local pad = o.Pad or 10
+		local grid = new("UIGridLayout", {
 			CellSize = UDim2.fromOffset(o.Cell.X, o.Cell.Y),
-			CellPadding = UDim2.fromOffset(o.Pad or 10, o.Pad or 10),
+			CellPadding = UDim2.fromOffset(pad, pad),
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Parent = sf,
 		})
+		-- stretch cells so whole columns fill the width (1 column on a narrow phone, 4+ on a monitor)
+		local function fit()
+			local width = sf.AbsoluteSize.X - 24
+			if width <= 0 then
+				return
+			end
+			local cols = math.max(1, math.floor((width + pad) / (o.Cell.X + pad)))
+			local w = math.floor((width - pad * (cols - 1)) / cols)
+			grid.CellSize = UDim2.fromOffset(w, o.Cell.Y)
+		end
+		sf:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit)
+		task.defer(fit)
 	else
 		new("UIListLayout", { Padding = UDim.new(0, o.Pad or 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = sf })
 	end
@@ -484,12 +617,14 @@ function Kit.tile(o)
 	if o.Rarity then
 		Kit.rarityStroke(stroke, o.Rarity)
 	end
-	local emoji = Kit.label({
+	local emoji = Kit.icon({
 		Name = "Emoji",
 		Parent = frame,
-		Position = UDim2.fromOffset(0, 16),
-		Size = UDim2.new(1, 0, 0, 66),
-		Text = o.Emoji or "",
+		Key = o.Icon,
+		Emoji = o.Emoji,
+		Position = UDim2.new(0.5, 0, 0, 14),
+		AnchorPoint = Vector2.new(0.5, 0),
+		Size = UDim2.fromOffset(68, 68),
 		TextSize = 50,
 	})
 	local name = Kit.label({
@@ -708,6 +843,31 @@ function Kit.confirm(gui, o)
 		end)
 	end)
 	return close
+end
+
+-- Anime-style speed lines flying outward from the screen centre.
+function Kit.speedLines(parent, color, duration)
+	local holder = new("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Parent = parent })
+	for i = 1, 20 do
+		local a = (i / 20) * math.pi * 2 + math.random() * 0.2
+		local line = new("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.fromOffset(math.random(110, 260), 3),
+			Position = UDim2.fromScale(0.5 + math.cos(a) * 0.34, 0.5 + math.sin(a) * 0.34),
+			Rotation = math.deg(a),
+			BackgroundColor3 = color or C.White,
+			BackgroundTransparency = 0.3,
+			BorderSizePixel = 0,
+			Parent = holder,
+		})
+		Kit.tween(line, duration or 0.5, {
+			Position = UDim2.fromScale(0.5 + math.cos(a) * 0.62, 0.5 + math.sin(a) * 0.62),
+			BackgroundTransparency = 1,
+		})
+	end
+	task.delay((duration or 0.5) + 0.1, function()
+		holder:Destroy()
+	end)
 end
 
 function Kit.burst(parent, color, count)

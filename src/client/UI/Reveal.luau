@@ -1,6 +1,7 @@
 -- Animal reveal card and level-up banner.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local Shared = ReplicatedStorage.Shared
 local Kit, Theme, Catalog = require(Shared.Kit), require(Shared.Theme), require(Shared.Catalog)
 local Util = require(Shared.Util)
@@ -28,6 +29,29 @@ function Reveal.show(result)
 	})
 	Kit.tween(dim, 0.25, { BackgroundTransparency = 0.45 })
 
+	local rays = Kit.new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(1100, 1100),
+		BackgroundTransparency = 1,
+		Parent = dim,
+	})
+	for i = 0, 11 do
+		Kit.new("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(46, 1100),
+			Rotation = i * 15,
+			BackgroundColor3 = rarity.Color,
+			BackgroundTransparency = 0.82,
+			BorderSizePixel = 0,
+			Parent = rays,
+		})
+	end
+	local spin = RunService.RenderStepped:Connect(function(dt)
+		rays.Rotation += dt * 14
+	end)
+
 	local card = Kit.new("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -54,15 +78,17 @@ function Reveal.show(result)
 	end
 	Kit.label({ Parent = ribbon, Text = rarity.Name, Font = F.Display, TextSize = 22, TextColor3 = C.Ink })
 
-	local emoji = Kit.label({
+	local emoji = Kit.icon({
 		Parent = card,
-		Position = UDim2.fromOffset(0, 58),
-		Size = UDim2.new(1, 0, 0, 130),
-		Text = animal.Emoji,
+		Key = animal.Icon,
+		Emoji = animal.Emoji,
+		Position = UDim2.new(0.5, 0, 0, 58),
+		AnchorPoint = Vector2.new(0.5, 0),
+		Size = UDim2.fromOffset(130, 130),
 		TextSize = 104,
 	})
 	TweenService:Create(emoji, TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-		Position = UDim2.fromOffset(0, 46),
+		Position = UDim2.new(0.5, 0, 0, 46),
 	}):Play()
 
 	Kit.label({
@@ -77,7 +103,7 @@ function Reveal.show(result)
 		Parent = card,
 		Position = UDim2.fromOffset(10, 230),
 		Size = UDim2.new(1, -20, 0, 26),
-		Text = `<font color="#{size.Color:ToHex()}">{size.Name}</font>  ·  {Theme.Icons.Money} {Util.fmt(Catalog.income(animal.Id, size.Name))}/s`,
+		Text = `<font color="#{size.Color:ToHex()}">{size.Name}</font>  ·  ${Util.fmt(Catalog.income(animal.Id, size.Name))}/s`,
 		Font = F.Bold,
 		TextSize = 19,
 		RichText = true,
@@ -108,6 +134,7 @@ function Reveal.show(result)
 	end
 
 	local function close()
+		spin:Disconnect()
 		if dim.Parent then
 			dim:Destroy()
 		end

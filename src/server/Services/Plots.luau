@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage.Shared
 local Config, Catalog = require(Shared.Config), require(Shared.Catalog)
+local Icons = require(Shared.Icons)
 local WorldBuilder = require(script.Parent.WorldBuilder)
 local PlayerData = require(script.Parent.PlayerData)
 local Economy = require(script.Parent.Economy)
@@ -77,19 +78,29 @@ local function spawnPet(folder, plot, animalData)
 	gui.Parent = pet
 	local badge = Instance.new("Frame")
 	badge.Size = UDim2.fromScale(1, 1)
-	badge.BackgroundColor3 = rarity.Color
+	badge.BackgroundColor3 = animal.Hair
 	badge.BackgroundTransparency = 0.35
 	badge.Parent = gui
 	Instance.new("UICorner", badge).CornerRadius = UDim.new(1, 0)
 	local ring = Instance.new("UIStroke")
-	ring.Color, ring.Thickness = Color3.fromHex("14363B"), 2
+	ring.Color, ring.Thickness = rarity.Color, 3
 	ring.Parent = badge
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.TextScaled = true
-	label.Text = animal.Emoji
-	label.Parent = badge
+	local image = Icons.image(animal.Icon)
+	if image then
+		local portrait = Instance.new("ImageLabel")
+		portrait.Size = UDim2.fromScale(0.84, 0.84)
+		portrait.Position = UDim2.fromScale(0.08, 0.08)
+		portrait.BackgroundTransparency = 1
+		portrait.Image = image
+		portrait.Parent = badge
+	else
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundTransparency = 1
+		label.TextScaled = true
+		label.Text = animal.Emoji
+		label.Parent = badge
+	end
 
 	wander(pet, plot)
 end
